@@ -31,5 +31,7 @@ if __name__ == '__main__':
         
         udp_server.start()
         fastapi_server.start()
-        
-        udp_server.join()
+        try:
+            udp_server.join()
+        except KeyboardInterrupt:
+            pass
