@@ -5,8 +5,10 @@ from qrcode.image.pure import PyPNGImage
 from functools import lru_cache
 from io import BytesIO
 
+import settings
 
-@lru_cache(maxsize=255)
+
+@lru_cache(maxsize=settings.cache_size)
 def make_qr_code(text:str = ''):
     """
     Основная CPU-bound функция, генерирующая QR-код. Принимает текст в виде str-строки и возвращает байтовую строку с png файлом.
@@ -14,9 +16,9 @@ def make_qr_code(text:str = ''):
     
     code = QRCode(
         version=1,
-        error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=10,
-        border=0,
+        error_correction=settings.correction,
+        box_size=settings.picture_resolution_ratio,
+        border=settings.border_size,
         image_factory=PyPNGImage
     )
     

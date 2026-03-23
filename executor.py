@@ -1,10 +1,17 @@
 import concurrent.futures
-from os import cpu_count
 from sys import version_info
 from sysconfig import get_config_var
 
+from settings import workers
+
 
 def get_executor():
+    """
+    Возвращает Executor, наиболее подходящий для CPU-bound задач.
+    Если GIL отключен (3.13+), возвращает ThreadPoolExecutor.
+    Если версия >= 3.14, возвращает InterpreterPoolExecutor.
+    Иначе или при любой ошибке возвращает ProcessPoolExecutor как наиболее универсальный выбор.
+    """
     try:
         python_version = (version_info.major, version_info.minor)
         gil = True
@@ -16,12 +23,12 @@ def get_executor():
             interpreter = True
 
         if gil and interpreter:
-            cpu_exec = concurrent.futures.InterpreterPoolExecutor(cpu_count())
+            cpu_exec = concurrent.futures.InterpreterPoolExecutor(workers)
         elif not gil:
-            cpu_exec = concurrent.futures.ThreadPoolExecutor(cpu_count())
+            cpu_exec = concurrent.futures.ThreadPoolExecutor(workers)
         else:
-            cpu_exec = concurrent.futures.ProcessPoolExecutor(cpu_count())
+            cpu_exec = concurrent.futures.ProcessPoolExecutor(workers)
     except:
-        cpu_exec = concurrent.futures.ProcessPoolExecutor(cpu_count())
+        cpu_exec = concurrent.futures.ProcessPoolExecutor(workers)
     
     return cpu_exec
