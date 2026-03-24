@@ -2,18 +2,18 @@ from fastapi import FastAPI, Path, Response
 import uvicorn
 
 import asyncio
+from concurrent.futures import ProcessPoolExecutor
 from typing import Annotated
 from threading import Thread
 
 from qr_code_maker import make_qr_code
-from executor import get_executor
 from udp_broadcast_discover.check_existing import is_there_running_server
 from udp_broadcast_discover.udp_discover_server import UdpDiscoverer
-from settings import host, port
+from settings import host, port, workers
 
 
 app = FastAPI()
-cpu_exec = get_executor()
+cpu_exec = ProcessPoolExecutor(workers)
 
 
 @app.get("/{str_to_code}")
